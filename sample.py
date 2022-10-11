@@ -71,14 +71,14 @@ def parse_args():
 args = parse_args()
 
 with open(os.path.join(args.input_dir, 'charmap.pickle'), 'rb') as f:
-    charmap = pickle.load(f)
+    charmap = pickle.load(f, encoding="latin1")
 
 with open(os.path.join(args.input_dir, 'inv_charmap.pickle'), 'rb') as f:
-    inv_charmap = pickle.load(f)
+    inv_charmap = pickle.load(f, encoding="latin1")
 
 fake_inputs = models.Generator(args.batch_size, args.seq_length, args.layer_dim, len(charmap))
 
-with tf.Session() as session:
+with tf.compat.v1.Session() as session:
 
     def generate_samples():
         samples = session.run(fake_inputs)
@@ -97,7 +97,7 @@ with tf.Session() as session:
                     s = "".join(s).replace('`', '')
                     f.write(s + "\n")
 
-    saver = tf.train.Saver()
+    saver = tf.compat.v1.train.Saver()
     saver.restore(session, args.checkpoint)
 
     samples = []
