@@ -3,13 +3,15 @@ import time
 import pickle
 import argparse
 
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 import numpy as np
 import tflib as lib
 import tflib.ops.linear
 import tflib.ops.conv1d
 import utils
 import models
+
+tf.disable_v2_behavior()
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -71,10 +73,10 @@ def parse_args():
 args = parse_args()
 
 with open(os.path.join(args.input_dir, 'charmap.pickle'), 'rb') as f:
-    charmap = pickle.load(f)
+    charmap = pickle.load(f, encoding="latin1")
 
 with open(os.path.join(args.input_dir, 'inv_charmap.pickle'), 'rb') as f:
-    inv_charmap = pickle.load(f)
+    inv_charmap = pickle.load(f, encoding="latin1")
 
 fake_inputs = models.Generator(args.batch_size, args.seq_length, args.layer_dim, len(charmap))
 
@@ -84,15 +86,15 @@ with tf.Session() as session:
         samples = session.run(fake_inputs)
         samples = np.argmax(samples, axis=2)
         decoded_samples = []
-        for i in xrange(len(samples)):
+        for i in range(len(samples)):
             decoded = []
-            for j in xrange(len(samples[i])):
+            for j in range(len(samples[i])):
                 decoded.append(inv_charmap[samples[i][j]])
             decoded_samples.append(tuple(decoded))
         return decoded_samples
 
     def save(samples):
-        with open(args.output, 'a') as f:
+        with open(args.output, 'a', encoding="latin1") as f:
                 for s in samples:
                     s = "".join(s).replace('`', '')
                     f.write(s + "\n")
@@ -103,7 +105,7 @@ with tf.Session() as session:
     samples = []
     then = time.time()
     start = time.time()
-    for i in xrange(int(args.num_samples / args.batch_size)):
+    for i in range(int(args.num_samples / args.batch_size)):
         
         samples.extend(generate_samples())
 

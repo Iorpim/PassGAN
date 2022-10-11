@@ -1,7 +1,9 @@
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 import tflib as lib
 import tflib.ops.linear
 import tflib.ops.conv1d
+
+tf.disable_v2_behavior()
 
 def ResBlock(name, inputs, dim):
     output = inputs
